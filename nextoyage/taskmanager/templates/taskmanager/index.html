@@ -1,0 +1,21 @@
+{% load static %}
+
+<!-- <link rel="stylesheet" href="{% static 'polls/style.css' %}"> -->
+	<h1> Prochaine tache !</h1>
+
+<form action="{% url 'taskmanager:done' %}" method="post">
+	{% csrf_token %}
+	{% if to_do_list %}
+	<label for="task"> Liste des trucs à faire : </label>
+
+	<fieldset>
+		<select name="task" id="task">
+			<ul>
+				{% for tache in to_do_list %}
+				<option value={{ tache.id }}> {{ tache.tache_text }}  ({{tache.duration}} min)</option>
+				{% endfor %}
+		</select>
+		<input type="submit" value="Je l'ai fait !">
+	</fieldset>
+	{% endif %}
+</form>
