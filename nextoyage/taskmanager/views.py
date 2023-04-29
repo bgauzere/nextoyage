@@ -31,3 +31,12 @@ def done(request):
                             real_duration=tache.duration)
     session.save()
     return HttpResponseRedirect(reverse('taskmanager:index'))
+
+
+def stats(request):
+    total_minutes_per_week = sum(
+        [t.duration * (7/t.frequence_int) for t in Tache.objects.all()])
+    context = {
+        "total_minutes_per_week": total_minutes_per_week
+    }
+    return render(request, 'taskmanager/stats.html', context)
