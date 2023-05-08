@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from datetime import datetime
+from django.utils import timezone
 
 from .models import Tache, SessionMenage
 
@@ -11,14 +12,31 @@ def index(request):
     task_to_do_list = Tache.objects.all()  # order_by('days_late')
     task_to_do_list = [t for t in task_to_do_list if t.due]
     task_to_do_list.sort(key=lambda t: -t.days_late)
+    progression = get_progression()
     context = {
         'to_do_list': task_to_do_list,
+        'progression': progression
     }
     return render(request, 'taskmanager/index.html', context)
 
 
 # def index(request):
 #     return HttpResponse("Hello, world. You're at the taskmanager index.")
+
+def get_progression():
+    total_minutes_per_week = get_total_per_week()
+    total_minutes_last_7_days = get_total_last_7_days()
+    return f"{(total_minutes_last_7_days/total_minutes_per_week)*100:.0f}"
+
+
+def get_total_per_week():
+    return sum([t.duration * (7/t.frequence_int) for t in Tache.objects.all()])
+
+
+def get_total_last_7_days():
+    return sum([s.real_duration for s in
+                SessionMenage.objects.filter(quand__gte=timezone.now()-timezone.timedelta(days=7))])
+
 
 def done(request):
     tache_id = request.POST['task']
@@ -34,9 +52,13 @@ def done(request):
 
 
 def stats(request):
-    total_minutes_per_week = sum(
-        [t.duration * (7/t.frequence_int) for t in Tache.objects.all()])
+    total_minutes_per_week = get_total_per_week()
+    total_minutes_last_7_days = get_total_last_7_days()
+    progression = get_progression()
     context = {
+        "progression": progression,
+        "total_minutes_last_7_days": total_minutes_last_7_days,
         "total_minutes_per_week": total_minutes_per_week
     }
+
     return render(request, 'taskmanager/stats.html', context)

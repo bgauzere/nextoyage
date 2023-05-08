@@ -19,7 +19,11 @@
 		<div class="container">
 			<div class="row align-items-center  g-5">
 				<div class="col">
-					<h1> {{total_minutes_per_week}} minutes par semaine </h1>
+					<h1> Progression </h1>
+					<div class="progress">
+						<div class="progress-bar" role="progressbar" style="width: {{progression}}%;" aria-valuenow="{{progression}}" aria-valuemin="0" aria-valuemax="100">{{progression}}%</div>
+					</div>
+					<div>{{total_minutes_per_week}} minutes par semaine</div>
 				</div>
 			</div>
 			<div class="row align-items-center  g-5">
