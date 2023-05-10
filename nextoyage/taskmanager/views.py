@@ -33,6 +33,18 @@ def get_total_per_week():
     return sum([t.duration * (7/t.frequence_int) for t in Tache.objects.all()])
 
 
+def get_minutes_by_days(nb_last_days=7):
+    days = []
+    minutes = []
+    for i in range(nb_last_days, -1, -1):
+        minutes_for_day = sum([s.real_duration for s in
+                               SessionMenage.objects.filter(quand=timezone.now()-timezone.timedelta(days=i))])
+        minutes.append(minutes_for_day)
+        days.append(
+            (timezone.now()-timezone.timedelta(days=i)).strftime("%A"))
+    return days, minutes
+
+
 def get_total_last_7_days():
     return sum([s.real_duration for s in
                 SessionMenage.objects.filter(quand__gte=timezone.now()-timezone.timedelta(days=7))])
@@ -55,10 +67,15 @@ def stats(request):
     total_minutes_per_week = get_total_per_week()
     total_minutes_last_7_days = get_total_last_7_days()
     progression = get_progression()
+    days, minutes = get_minutes_by_days()
+    print(days)
     context = {
+        "days": days,
+        "minutes_per_day": minutes,
         "progression": progression,
         "total_minutes_last_7_days": total_minutes_last_7_days,
-        "total_minutes_per_week": total_minutes_per_week
+        "total_minutes_per_week": total_minutes_per_week,
+
     }
 
     return render(request, 'taskmanager/stats.html', context)
