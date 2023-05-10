@@ -74,7 +74,7 @@ def stats(request):
         "minutes_per_day": minutes,
         "progression": progression,
         "total_minutes_last_7_days": total_minutes_last_7_days,
-        "total_minutes_per_week": total_minutes_per_week,
+        "total_minutes_per_week": round(total_minutes_per_week),
 
     }
 
